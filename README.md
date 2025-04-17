@@ -78,6 +78,49 @@ CTTCAATTACCCTGCTGACGCGAGATACCTTATGCATCGAAGGTAAAGCGATGAATTTAT
 CCAAGGTTTTAATTTG
 ```
 
+## Why?
+In bioinformatics we often spend a lot of time reformating incompatible file formats.
+Unfortunately the FASTA-format is not very standardized in the way how many characters can be stored in a line.
+Multi-FASTA files can consist of one sequence entry with 10000bp stored in a single line and another entry with 500bp stored across 10 lines of 50 characters each.
+This unreliability makes it difficult to quickly obtain what you need from a multi-FASTA file.
+Additionally we sometimes encounter datasets like in this zenodo archive [Metagenomic Immunoglobulin Sequencing (MIG-Seq)](https://doi.org/10.5281/zenodo.11154974) where the multi-FASTA file *"FF_genomeSetAlpha.fasta"*, containing multiple bacterial genomes concatenated after one another, has a file size of 11 GB.
+Additional info which FASTA entry belongs to which original genome FASTA file is stored in the file *"FF_genomeSetAlpha.stb"*, looking like this:
+
+```
+COASSEMBLY_8037__NODE_44588_length_1988_cov_159.115123	METABAT215_SUBJECTMAPPING_SCAFFOLDS_min1500_COASSEMBLY_8037_1500_MERGED_77_METASPADES__.259.fa
+COASSEMBLY_8037__NODE_46193_length_1904_cov_21.099617	METABAT215_SUBJECTMAPPING_SCAFFOLDS_min1500_COASSEMBLY_8037_1500_MERGED_77_METASPADES__.259.fa
+COASSEMBLY_8037__NODE_47024_length_1865_cov_19.922819	METABAT215_SUBJECTMAPPING_SCAFFOLDS_min1500_COASSEMBLY_8037_1500_MERGED_77_METASPADES__.259.fa
+COASSEMBLY_8037__NODE_53381_length_1607_cov_96.412418	METABAT215_SUBJECTMAPPING_SCAFFOLDS_min1500_COASSEMBLY_8037_1500_MERGED_77_METASPADES__.259.fa
+COASSEMBLY_8037__NODE_54583_length_1566_cov_35.544661	METABAT215_SUBJECTMAPPING_SCAFFOLDS_min1500_COASSEMBLY_8037_1500_MERGED_77_METASPADES__.259.fa
+COASSEMBLY_8037__NODE_89_length_301076_cov_5.107100	METABAT215_SUBJECTMAPPING_SCAFFOLDS_min1500_COASSEMBLY_8037_1500_MERGED_77_METASPADES__.27.fa
+COASSEMBLY_8037__NODE_140_length_250557_cov_5.349513	METABAT215_SUBJECTMAPPING_SCAFFOLDS_min1500_COASSEMBLY_8037_1500_MERGED_77_METASPADES__.27.fa
+COASSEMBLY_8037__NODE_351_length_167585_cov_4.975559	METABAT215_SUBJECTMAPPING_SCAFFOLDS_min1500_COASSEMBLY_8037_1500_MERGED_77_METASPADES__.27.fa
+COASSEMBLY_8037__NODE_370_length_163718_cov_4.418550	METABAT215_SUBJECTMAPPING_SCAFFOLDS_min1500_COASSEMBLY_8037_1500_MERGED_77_METASPADES__.27.fa
+COASSEMBLY_8037__NODE_410_length_156112_cov_5.125324	METABAT215_SUBJECTMAPPING_SCAFFOLDS_min1500_COASSEMBLY_8037_1500_MERGED_77_METASPADES__.27.fa
+```
+
+In order to obtain single bacterial genomes from those two files one could run this command:
+
+```
+# extract multi-line fasta entries by fasta-header provided in a file
+while IFS= read -r line; do
+# uncomment the next line to run parallel jobs for each output.fasta file
+#	( 
+	# create a tmp file which holds all the contigs that need to go into this single fasta file
+	grep "$line" FF_genomeSetAlpha.tsv | awk '{print $1}'> ${line}_entrylist;
+
+	# gather all fasta entries defined in tmp and write them into a single fasta file
+	./extract_fasta_entries.sh ${fasta} ${line}_entrylist > ${line}; 
+
+	# clean up
+	rm ${line}_entrylist
+# uncomment the next line to run parallel jobs for each output.fasta file
+#	) &
+done < FF_genomeSetAlpha.stb
+```
+**NOTE**: This above code still ran 2 days on my machine. Better don't create this huge FASTA-files in the first place, if you can avoid it.
+
+
 
 
 
