@@ -15,7 +15,8 @@ Fasta headers (names) are either given as command-line input for only one entry 
 
 `./fastrack.sh INPUT.fasta "SearchQuery" | QUERYLIST.txt`
 
-The output will be printed on screen. So you probably want to redirect via something like: 
+The output will be printed on screen. So you probably want to redirect via something like:
+
 `./fastrack.sh INPUT.fasta "SearchQuery" > OUTPUT.fasta`
 
 ## Example
