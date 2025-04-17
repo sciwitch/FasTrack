@@ -57,15 +57,18 @@ ACGACTAGACATATATCAGCTCGCCGATTATTTGGATTATTCCCTG
 **Note:** For performance reasons, only the first hit will be reported and the search will be aborted after that.
 This makes it feasible to scroll through GB-sized fasta files and search for multiple sequences in seconds.
 
-Given a Query-File "query.txt" that looks like this:
+**Using a query file**
+Given a query file "query.txt" that looks like this:
 ```
 ID-001
 ID-003
 ```
 This command:
+
 `./fastrack.sh example.fasta query.txt > out.fa`
 
-Will create a new FASTA file with this content:
+Will create a new FASTA file looking like that:
+
 ```
 >sequenceID-001 description
 AAGTAGGAATAATATCTTATCATTATAGATAAAAACCTTCTGAATTTGCTTAGTGTGTAT
